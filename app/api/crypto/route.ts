@@ -1,3 +1,5 @@
+// eslint-disable @typescript-eslint/no-unused-vars
+
 import { NextResponse } from 'next/server';
 
 const API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';

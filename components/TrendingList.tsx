@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useCryptoStore } from '@/store/useCryptoStore';
+import Image from 'next/image';
 
 interface Crypto {
   id: number;
@@ -65,7 +66,7 @@ const TrendingList: React.FC<Props> = ({ title, icon, cryptos }) => {
             <li key={crypto.id} className="flex justify-between items-center p-2 border rounded-lg border-gray-700">
               {/* Coin Name & Logo */}
               
-                {crypto.logo && <img src={crypto.logo} alt={crypto.name} className="w-5 h-5 rounded-full" />}
+                {crypto.logo && <Image src={icon} alt={`${title} icon`} width={24} height={24} />}
                 <span> {crypto.name} ({crypto.symbol})</span>
               {activeTab === 'price' && <span>${crypto.quote[currency].price.toFixed(2)}</span>}
               {activeTab === 'percentage' && (

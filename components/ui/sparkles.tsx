@@ -1,4 +1,5 @@
 "use client";
+//eslint-disable @typescript-eslint/no-explicit-any
 import React, { useId, useMemo } from "react";
 import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";

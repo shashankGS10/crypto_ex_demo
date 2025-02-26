@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import Top10List from '@/components/Top10List';
 import { useCryptoStore } from '@/store/useCryptoStore';
 
 const HomePage = () => {
-  const { activeCategory } = useCryptoStore();
   const [cryptos, setCryptos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
