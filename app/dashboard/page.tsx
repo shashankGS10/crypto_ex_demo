@@ -1,41 +1,45 @@
-'use client';
+"use client";
+import FullTable from "@/components/FullTable";
+import CoinListCard from "@/components/CoinListCard";
+import FearGreedCard from "@/components/FearGreedCard";
+import DominanceChart from "@/components/DominanceChart";
+import CMC100Card from "@/components/CMC100Card";
+import Globe from "@/components/Globe";
+import Top10List from "@/components/Top10List";
 
-import React, { useEffect, useState } from 'react';
-import Top10List from '@/components/Top10List';
-import { useCryptoStore } from '@/store/useCryptoStore';
 
-const HomePage = () => {
-  const [cryptos, setCryptos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/crypto?convert=USD`);
-        if (!response.ok) throw new Error('Failed to fetch data');
-        
-        const data = await response.json();
-        setCryptos(data.data || []);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
+export default function Dashboard() {
   return (
-    <div className="container mx-auto p-4 text-white">
-      <h1 className="text-2xl font-bold mb-4 text-black">Top 50 Cryptocurrencies</h1>
-      <Top10List cryptos={cryptos} />
+    <div className="px-4 py-6 bg-neutral-950 text-neutral-100 min-h-screen">
+      {/* Bento Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* Left column */}
+        <div className="space-y-6">
+          <CoinListCard title="Most Visited" type="mostVisited" />
+          <CoinListCard title="Trending on DexScan" type="trending" />
+        </div>
+
+        {/* Middle column */}
+        <div className="space-y-4">
+          <FearGreedCard />
+          <div className="space-y-2">
+        <Top10List/>
+        </div>
+        </div>
+
+        {/* Right column */}
+        <div className="space-y-4">
+          <CMC100Card />
+          
+          <DominanceChart />
+        </div>
+        <Globe />
+        
+      </div>
+      {/* FullTable of all coins (existing component) */}
+      <div className="mt-8">
+        <FullTable />
+      </div>
     </div>
   );
-};
-
-export default HomePage;
+}

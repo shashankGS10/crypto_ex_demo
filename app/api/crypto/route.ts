@@ -1,31 +1,27 @@
-// eslint-disable @typescript-eslint/no-unused-vars
+import { NextResponse } from "next/server";
 
-import { NextResponse } from 'next/server';
-
-const API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
-const API_KEY = process.env.CMC_API_KEY;
+const CMC_API_KEY = process.env.COINMARKETCAP_API_KEY; // Ensure your CoinMarketCap API key is set in env
 
 export async function GET(request: Request) {
+  // Parse query param for currency (default to USD if not provided)
   const { searchParams } = new URL(request.url);
-  const convert = searchParams.get('convert') || 'USD';
-  const category = searchParams.get('category') || 'trending';
+  const currency = searchParams.get("currency")?.toUpperCase() || "USD";
 
-  let queryParams = `?limit=50&convert=${convert}`;
-  if (category === 'recentlyAdded') queryParams += '&sort=date_added';
-  if (category === 'mostViewed') queryParams += '&sort=volume_24h';
-
+  // CoinMarketCap API endpoint for top 50 cryptocurrencies by market cap
+  const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=50&convert=${currency}`;
   try {
-    const response = await fetch(`${API_URL}${queryParams}`, {
-      headers: { 'X-CMC_PRO_API_KEY': API_KEY! },
+    // Fetch data from CoinMarketCap API with the required header&#8203;:contentReference[oaicite:0]{index=0}
+    const response = await fetch(url, {
+      headers: { "X-CMC_PRO_API_KEY": CMC_API_KEY! }
     });
-
     if (!response.ok) {
-      return NextResponse.json({ error: 'Failed to fetch data' }, { status: response.status });
+      throw new Error(`CMC API error: ${response.status}`);
     }
-
-    const data = await response.json();
-    return NextResponse.json({ data: data.data });
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    const json = await response.json();
+    // Return only the data array (list of crypto info) as JSON&#8203;:contentReference[oaicite:1]{index=1}
+    return NextResponse.json(json.data);
+  } catch (err: any) {
+    console.error("CMC API fetch failed:", err);
+    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
 }

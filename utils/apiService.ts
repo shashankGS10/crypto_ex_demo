@@ -1,54 +1,79 @@
-const API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency';
-const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY!;
+export interface CryptoQuote {
+  price: number;
+  percent_change_1h: number;
+  percent_change_24h: number;
+  percent_change_7d: number;
+  market_cap: number;
+  volume_24h: number;
+}
 
-export const fetchCryptos = async (currency: string, category: string) => {
-  let endpoint = '';
-  switch (category) {
-    case 'trending':
-      endpoint = 'trending/latest';
-      break;
-    case 'recently_added':
-      endpoint = 'listings/latest';
-      break;
-    case 'most_visited':
-      endpoint = 'mostvisited/latest';
-      break;
-    default:
-      endpoint = 'listings/latest';
+export interface CryptoData {
+  id: number;
+  name: string;
+  symbol: string;
+  circulating_supply: number;
+  quote: Record<string, CryptoQuote>;
+}
+
+export interface DominanceData {
+  name: string;
+  value: number;
+}
+
+// In-memory cache for API responses to avoid repetitive calls
+const cache: {
+  [key: string]: { timestamp: number; data: CryptoData[] | DominanceData[] };
+} = {};
+
+const CACHE_DURATION = 5 * 60 * 1000; // e.g. 5 minutes
+
+/**
+ * Fetch top-50 cryptos from /api/crypto?currency=XXXX
+ * Uses a simple in-memory cache for 5 minutes.
+ */
+export async function fetchCryptoData(currency: string): Promise<CryptoData[]> {
+  const cacheKey = currency.toUpperCase();
+  const now = Date.now();
+
+  // Return cached data if it exists and is fresh
+  if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_DURATION) {
+    return cache[cacheKey].data as CryptoData[];
   }
 
   try {
-    const response = await fetch(`${API_URL}/${endpoint}?limit=10&convert=${currency}`, {
-      headers: { 'X-CMC_PRO_API_KEY': API_KEY },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch crypto data');
+    const res = await fetch(`/api/crypto?currency=${cacheKey}`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch crypto data: ${res.status}`);
     }
-
-    const data = await response.json();
-    return data.data;
-  } catch (error) {
-    console.error('Crypto API Error:', error);
-    throw error;
+    const data: CryptoData[] = await res.json();
+    // Cache the fetched data with a timestamp
+    cache[cacheKey] = { data, timestamp: now };
+    return data;
+  } catch (err) {
+    console.error("Error fetching crypto data:", err);
+    throw err;
   }
-};
+}
 
-// Fetch 7-day historical price data
-export const fetchCryptoHistory = async (cryptoId: string, currency: string) => {
+
+export async function fetchDominanceData(): Promise<DominanceData[]> {
+  const cacheKey = 'dominance';
+  const now = Date.now();
+
+  if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_DURATION) {
+    return cache[cacheKey].data as DominanceData[];
+  }
+
   try {
-    const response = await fetch(`${API_URL}/quotes/historical?id=${cryptoId}&interval=1d&convert=${currency}`, {
-      headers: { 'X-CMC_PRO_API_KEY': API_KEY },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch historical data');
+    const res = await fetch("/api/crypto/dominance");
+    if (!res.ok) {
+      throw new Error(`Failed to fetch dominance data: ${res.statusText}`);
     }
-
-    const data = await response.json();
-    return data.data.quotes.map((quote: any) => quote.price); // Extract 7-day prices
-  } catch (error) {
-    console.error(`Error fetching history for ${cryptoId}:`, error);
-    return [];
+    const data: DominanceData[] = await res.json();
+    cache[cacheKey] = { data, timestamp: now };
+    return data;
+  } catch (err) {
+    console.error("Error fetching dominance data:", err);
+    throw err;
   }
-};
+}

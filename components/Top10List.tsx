@@ -1,150 +1,116 @@
-import React, { useMemo, useState } from 'react';
-import { useCryptoStore } from '@/store/useCryptoStore';
-import TrendingList from './TrendingList';
+"use client";
 
-interface Crypto {
-  id: number;
-  name: string;
-  symbol: string;
-  date_added: string;
-  quote: {
-    [currency: string]: {
-      price: number;
-      percent_change_1h: number;
-      percent_change_24h: number;
-      percent_change_7d: number;
-      market_cap: number;
-      volume_24h: number;
-    };
-  };
-}
+import { useState } from "react";
+import { useCryptoStore } from "@/store/useCryptoStore";
+import { motion } from "framer-motion";
 
-interface Props {
-  cryptos: Crypto[];
-}
+const categories = ["🔥", "🆕", "👀"];
 
-const CryptoTable: React.FC<Props> = ({ cryptos }) => {
-  const { activeCategory, currency, activeTab, setActiveTab } = useCryptoStore();
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table'); // Toggle Table / Card View
-  const [sortTimeFrame, setSortTimeFrame] = useState<'1h' | '24h' | '7d'>('24h'); // Sorting Time Frame
+const Top10List = () => {
+  const cryptos = useCryptoStore((state) => state.cryptos);
+  const [activeCategory, setActiveCategory] = useState("🔥");
 
-  const sortedFilteredCryptos = useMemo(() => {
-    let filtered = [...cryptos];
-
-    // Sorting logic based on activeTab
-    filtered.sort((a, b) => {
-      const timeframeKey = `percent_change_${sortTimeFrame}`;
-      switch (activeTab) {
-        case 'price':
-          return b.quote[currency].price - a.quote[currency].price;
-        case 'percentage':
-          return b.quote[currency][timeframeKey] - a.quote[currency][timeframeKey];
-        case 'volume':
-          return b.quote[currency].volume_24h - a.quote[currency].volume_24h;
-        default:
-          return 0;
-      }
-    });
-
-    // Filtering for "Recently Added"
-    if (activeCategory === 'recently_added') {
-      filtered = filtered.sort((a, b) => new Date(b.date_added).getTime() - new Date(a.date_added).getTime());
+  // Sort the cryptos based on the chosen category
+  const getCategoryData = () => {
+    switch (activeCategory) {
+      case "🔥":
+        return [...cryptos]
+          .sort((a, b) => b.quote.USD.percent_change_24h - a.quote.USD.percent_change_24h)
+          .slice(0, 10);
+      case "🆕":
+        return [...cryptos]
+          .sort((a, b) => new Date(b.date_added).getTime() - new Date(a.date_added).getTime())
+          .slice(0, 10);
+      case "👀":
+        return [...cryptos]
+          .sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
+          .slice(0, 10);
+      default:
+        return [];
     }
+  };
 
-    return filtered;
-  }, [cryptos, activeTab, currency, activeCategory, sortTimeFrame]);
+  const data = getCategoryData();
 
   return (
-    <div className="bg-gray-900 p-6 rounded-lg w-full max-w-6xl">
-      <div className="flex items-center justify-between mb-4">
-        <TrendingList title="Top 10 Cryptos" icon="🔥" cryptos={sortedFilteredCryptos} />
-      </div>
-      <hr className="my-4 border-gray-700" />
-      {/* Sorting & View Toggle */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-white">Crypto Dashboard</h2>
-        <p className="text-gray-400">Top 10 Cryptocurrencies by {activeTab}</p>
-      </div>
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2">
-          <button className={`p-2 rounded ${activeTab === 'price' ? 'bg-gray-700' : 'bg-gray-800'}`} onClick={() => setActiveTab('price')}>
-            💰 Price
-          </button>
-          <button className={`p-2 rounded ${activeTab === 'percentage' ? 'bg-gray-700' : 'bg-gray-800'}`} onClick={() => setActiveTab('percentage')}>
-            📈 % Change
-          </button>
-          <button className={`p-2 rounded ${activeTab === 'volume' ? 'bg-gray-700' : 'bg-gray-800'}`} onClick={() => setActiveTab('volume')}>
-            🔊 Volume
-          </button>
-        </div>
-
-        <div className="flex space-x-2">
-          <button onClick={() => setViewMode('table')} className={`p-2 rounded ${viewMode === 'table' ? 'bg-gray-700' : 'bg-gray-800'}`}>
-            📊 Table
-          </button>
-          <button onClick={() => setViewMode('cards')} className={`p-2 rounded ${viewMode === 'cards' ? 'bg-gray-700' : 'bg-gray-800'}`}>
-            🏷 Cards
-          </button>
-        </div>
-      </div>
+    <motion.div
+      className="p-4 bg-[#1F1F2E] rounded-xl shadow-lg border border-gray-800 w-full"
+      style={{ maxWidth: "340px" }} // Optional fixed width if desired
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       
-      {/* Sorting Time Frame */}
-      <div className="flex justify-start space-x-4 mb-4">
-        {['1h', '24h', '7d'].map((time) => (
-          <button
-            key={time}
-            onClick={() => setSortTimeFrame(time as '1h' | '24h' | '7d')}
-            className={`px-4 py-2 rounded ${sortTimeFrame === time ? 'bg-blue-600' : 'bg-gray-800'}`}
-          >
-            {time.toUpperCase()}
-          </button>
-        ))}
-      </div>
-        
-      {/* Toggle Between Table or Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-5">
-          {sortedFilteredCryptos.slice(0, 10).map((crypto) => (
-            <div key={crypto.id} className="bg-gray-800 p-4 rounded-lg shadow-md">
-              <h3 className="font-bold text-lg">{crypto.name} ({crypto.symbol})</h3>
-              <p className="text-gray-300">${crypto.quote[currency].price.toFixed(2)}</p>
-              <p className={`text-sm ${crypto.quote[currency][`percent_change_${sortTimeFrame}`] >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {crypto.quote[currency][`percent_change_${sortTimeFrame}`].toFixed(2)}%
-              </p>
-            </div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-gray-300 text-xs font-semibold">
+          Top 10
+        </h2>
+        <h2 className="text-gray-300 text-xs font-semibold">{activeCategory === "🔥" ? "Trending" : activeCategory === "🆕" ? "New Added" : "Most Visited"}</h2>
+        <div className="flex space-x-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition ${
+                activeCategory === category
+                  ? "bg-blue-500 text-white"
+                  : "bg-[#2A2A3D] text-gray-300 hover:bg-[#34344e]"
+              }`}
+            >
+              {category}
+            </button>
           ))}
         </div>
+      </div>
 
-        <table className="min-w-full text-left text-sm text-gray-200">
-          <thead className="bg-gray-800 uppercase text-xs text-gray-400">
-            <tr>
-              <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Price</th>
-              <th className="px-4 py-2">Change ({sortTimeFrame})</th>
-              <th className="px-4 py-2">Market Cap</th>
-              <th className="px-4 py-2">Volume</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedFilteredCryptos.slice(0, 10).map((crypto, index) => (
-              <tr key={crypto.id} className="border-b border-gray-700 border">
-                <td className="px-4 py-2">{index + 1}</td>
-                <td className="px-4 py-2">
-                  {crypto.name} ({crypto.symbol})
-                </td>
-                <td className="px-4 py-2">${crypto.quote[currency].price.toFixed(2)}</td>
-                <td className={`px-4 py-2 ${crypto.quote[currency][`percent_change_${sortTimeFrame}`] >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {crypto.quote[currency][`percent_change_${sortTimeFrame}`].toFixed(2)}%
-                </td>
-                <td className="px-4 py-2">${crypto.quote[currency].market_cap.toLocaleString()}</td>
-                <td className="px-4 py-2">${crypto.quote[currency].volume_24h.toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      
-    </div>
+      {data.length === 0 ? (
+        <p className="text-gray-400 text-xs">No data available.</p>
+      ) : (
+        // Container for the list with a max height & scrolling
+        <div className="max-h-64 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-700">
+          {data.map((coin, index) => {
+            const change24h = coin.quote.USD.percent_change_24h ?? 0;
+            const isPositive = change24h >= 0;
+            return (
+              <motion.div
+                key={coin.id}
+                className="flex items-center justify-between p-2 bg-[#2A2A3D] rounded-lg hover:bg-[#34344e] transition"
+                whileHover={{ scale: 1.01 }}
+              >
+                {/* Left side: rank & name */}
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-gray-400 font-semibold">
+                    {index + 1}.
+                  </span>
+                  <span className="text-gray-300 font-medium">
+                    {coin.name} <span className="text-gray-500">({coin.symbol})</span>
+                  </span>
+                </div>
+
+                {/* Right side: Price + 24h change */}
+                <div className="text-right">
+                  <p className="text-gray-300 text-xs">
+                    $
+                    {coin.quote.USD.price.toLocaleString(undefined, {
+                      maximumFractionDigits: 6,
+                    })}
+                  </p>
+                  <p
+                    className={`text-xs font-semibold ${
+                      isPositive ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {isPositive ? "+" : ""}
+                    {change24h.toFixed(2)}%
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </motion.div>
   );
 };
 
-export default CryptoTable;
+export default Top10List;
