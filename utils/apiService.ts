@@ -32,7 +32,6 @@ const CACHE_DURATION = 5 * 60 * 1000; // e.g. 5 minutes
  * Uses a simple in-memory cache for 5 minutes.
  */
 export async function fetchCryptoData(currency: string): Promise<CryptoData[]> {
-<<<<<<< Updated upstream
   const cacheKey = currency.toUpperCase();
   const now = Date.now();
 
@@ -77,45 +76,4 @@ export async function fetchDominanceData(): Promise<DominanceData[]> {
     console.error("Error fetching dominance data:", err);
     throw err;
   }
-=======
-  const cacheKey = currency.toLowerCase(); // unify to lowercase
-
-  // Return cached data if fresh
-  if (cache[cacheKey] && Date.now() - cache[cacheKey].timestamp < CACHE_DURATION) {
-    return cache[cacheKey].data as CryptoData[];
-  }
-
-  // Actually call /api/crypto with lowercase param
-  const res = await fetch(`/api/crypto?currency=${cacheKey}`);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch crypto data: ${res.status}`);
-  }
-
-  const data: CryptoData[] = await res.json();
-  cache[cacheKey] = { data, timestamp: Date.now() };
-  return data;
-}
-
-
-export async function fetchDominanceData(): Promise<DominanceData[]> {
-  const cacheKey = 'dominance';
-  const now = Date.now();
-
-  if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_DURATION) {
-    return cache[cacheKey].data as DominanceData[];
-  }
-
-  try {
-    const res = await fetch("/api/crypto/dominance");
-    if (!res.ok) {
-      throw new Error(`Failed to fetch dominance data: ${res.statusText}`);
-    }
-    const data: DominanceData[] = await res.json();
-    cache[cacheKey] = { data, timestamp: now };
-    return data;
-  } catch (err) {
-    console.error("Error fetching dominance data:", err);
-    throw err;
-  }
->>>>>>> Stashed changes
 }
