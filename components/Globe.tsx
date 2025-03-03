@@ -15,9 +15,13 @@ const RotatingGlobe: React.FC = () => {
   });
   return (
     <mesh ref={meshRef}>
+<<<<<<< Updated upstream
       {/* Sphere geometry to represent the globe */}
       <sphereGeometry args={[1, 32, 32]} />
       {/* Material can be a texture for Earth; using wireframe for a futuristic look */}
+=======
+      <sphereGeometry args={[1, 32, 32]} />
+>>>>>>> Stashed changes
       <meshStandardMaterial color="#0cf" wireframe />
     </mesh>
   );
