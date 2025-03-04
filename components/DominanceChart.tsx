@@ -1,6 +1,6 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { motion } from "framer-motion";
 import {fetchDominanceData} from "@/utils/apiService";
@@ -17,11 +17,11 @@ const DominanceChart = () => {
   >([]);
 
   // Example fallback slices if data is empty
-  const fallbackData = [
+  const fallbackData = useMemo(() => [
     { name: "BTC", value: 50, color: "#f2a900" },
-    { name: "ETH", value: 25, color: "#627eea" },
-    { name: "Others", value: 25, color: "#9c27b0" },
-  ];
+    { name: "ETH", value: 25, color: "#c6f200" },
+    { name: "Others", value: 25, color: "#0028f2" },
+  ], []);
 
   // On mount, fetch real data
   useEffect(() => {
@@ -32,10 +32,10 @@ const DominanceChart = () => {
           if (item.name.toLowerCase().includes("btc")) {
             return { ...item, color: "#f2a900" };
           } else if (item.name.toLowerCase().includes("eth")) {
-            return { ...item, color: "#627eea" };
+            return { ...item, color: "#c6f200" };
           }
           // default purple or random color
-          return { ...item, color: item.color || "#8884d8" };
+          return { ...item, color: item.color || "#0028f2" };
         });
         setDominance(finalData);
       })
@@ -44,7 +44,7 @@ const DominanceChart = () => {
         // fallback data if fetch fails
         setDominance(fallbackData);
       });
-  }, []);
+  }, [fallbackData]);
 
   // Fallback if dominance array is empty
   const chartData = dominance.length > 0 ? dominance : fallbackData;

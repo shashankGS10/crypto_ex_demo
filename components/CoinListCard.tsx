@@ -15,7 +15,7 @@ export default function CoinListCard({ title, type }: CoinListCardProps) {
   useEffect(() => {
     fetchCryptoData("USD")
       .then((data) => {
-        let sorted = [...data];
+        const sorted = [...data];
         if (type === "trending") {
           // sort by 24h % desc
           sorted.sort((a, b) => {

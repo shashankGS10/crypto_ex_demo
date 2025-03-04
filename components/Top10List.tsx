@@ -45,7 +45,7 @@ const Top10List = () => {
 
   return (
     <motion.div
-      className="p-4 bg-[#1F1F2E] rounded-xl shadow-lg border border-gray-800 w-full"
+      className="pt-4 pb-2 px-4 bg-[#1F1F2E] rounded-xl shadow-lg border border-gray-800 w-full"
       style={{ maxWidth: "340px" }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ const Top10List = () => {
             return (
               <motion.div
                 key={coin.id}
-                className="flex items-center justify-between p-2 bg-[#2A2A3D] rounded-lg hover:bg-[#34344e] transition"
+                className="flex items-center justify-between px-2 bg-[#2A2A3D] rounded-lg hover:bg-[#34344e] transition"
                 whileHover={{ scale: 1.01 }}
               >
                 {/* Left side: rank & name */}

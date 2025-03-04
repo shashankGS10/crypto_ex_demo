@@ -31,8 +31,8 @@ export default function FullTable() {
     fetchCryptoData(currency).then(data => {
       setCryptos(data);
       setLoading(false);
-    }).catch(err => {
-      setError("Unable to load data");
+    }).catch((err) => {
+      setError(`Unable to load data: ${err.message}`);
       setLoading(false);
     });
   }, [currency, setCryptos]);

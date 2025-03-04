@@ -20,9 +20,16 @@ export interface DominanceData {
   value: number;
 }
 
+export interface FearAndGreedData {
+  value: number;
+  value_classification: string;
+  timestamp: string;
+  time_until_update: string;
+}
+
 // In-memory cache for API responses to avoid repetitive calls
 const cache: {
-  [key: string]: { timestamp: number; data: CryptoData[] | DominanceData[] };
+  [key: string]: { timestamp: number; data: CryptoData[] | DominanceData[] | FearAndGreedData };
 } = {};
 
 const CACHE_DURATION = 5 * 60 * 1000; // e.g. 5 minutes
@@ -74,6 +81,34 @@ export async function fetchDominanceData(): Promise<DominanceData[]> {
     return data;
   } catch (err) {
     console.error("Error fetching dominance data:", err);
+    throw err;
+  }
+}
+
+export async function fetchFearAndGreedIndex(): Promise<FearAndGreedData> {
+  const cacheKey = 'fearGreedIndex';
+  const now = Date.now();
+
+  if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_DURATION) {
+    return cache[cacheKey].data as unknown as FearAndGreedData;
+  }
+
+  try {
+    const res = await fetch("https://api.alternative.me/fng/?limit=1");
+    if (!res.ok) {
+      throw new Error(`Failed to fetch Fear and Greed Index: ${res.statusText}`);
+    }
+    const data = await res.json();
+    const indexData: FearAndGreedData = {
+      value: parseInt(data.data[0].value, 10),
+      value_classification: data.data[0].value_classification,
+      timestamp: data.data[0].timestamp,
+      time_until_update: data.data[0].time_until_update,
+    };
+    cache[cacheKey] = { data: indexData, timestamp: now };
+    return indexData;
+  } catch (err) {
+    console.error("Error fetching Fear and Greed Index:", err);
     throw err;
   }
 }

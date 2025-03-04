@@ -33,8 +33,9 @@ export default function Dashboard() {
           
           <DominanceChart />
         </div>
+        <div className="space-y-1">
         <Globe />
-        
+        </div>
       </div>
       {/* FullTable of all coins (existing component) */}
       <div className="mt-8">

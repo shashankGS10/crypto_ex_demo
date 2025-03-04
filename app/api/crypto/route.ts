@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 
 const CMC_API_KEY = process.env.COINMARKETCAP_API_KEY; // Ensure your CoinMarketCap API key is set in env
