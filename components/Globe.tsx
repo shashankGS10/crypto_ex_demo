@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 // components/Globe.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -28,8 +30,8 @@ declare module "@react-three/fiber" {
 }
 
 const RING_PROPAGATION_SPEED = 3;
-const aspect = 1.2;
-const cameraZ = 450;
+const aspect = 1.8;
+const cameraZ = 250;
 
 type Position = {
   order: number;
@@ -105,7 +107,7 @@ export function WebGLRendererConfig() {
     gl.setPixelRatio(window.devicePixelRatio);
     gl.setSize(size.width, size.height);
     gl.setClearColor(0xffaaff, 0);
-  }, []);
+  }, [gl, size.height, size.width]);
   return null;
 }
 
@@ -167,7 +169,7 @@ function GlobeComponent({ globeConfig, data }: WorldProps) {
 
   const _buildData = () => {
     const arcs = data;
-    let points = [];
+    const points = [];
     for (let i = 0; i < arcs.length; i++) {
       const arc = arcs[i];
       const rgb = hexToRgb(arc.color) as { r: number; g: number; b: number };

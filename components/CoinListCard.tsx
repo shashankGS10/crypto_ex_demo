@@ -44,7 +44,7 @@ export default function CoinListCard({ title, type }: CoinListCardProps) {
       ) : (
         <ul className="space-y-2">
           {coins.map((coin, index) => (
-            <li key={coin.id} className="flex items-center justify-between text-sm">
+            <li key={coin.id} className="flex items-center justify-between text-xs p-1 bg-[#2A2A3D] rounded-lg hover:bg-[#34344e] transition">
               <div className="flex items-center space-x-2">
                 <span className="text-gray-400">{index + 1}</span>
                 <span className="text-gray-200 font-medium">{coin.name}</span>

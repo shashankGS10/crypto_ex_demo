@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import {
   GaugeContainer,
   GaugeValueArc,
-  GaugeReferenceArc,
   useGaugeState,
 } from "@mui/x-charts/Gauge";
 import { fetchFearAndGreedIndex } from "@/utils/apiService";
@@ -42,6 +41,7 @@ const FearAndGreedGauge = () => {
         else setLabel("Extreme Greed");
       } catch (error) {
         console.error("Error fetching Fear and Greed Index:", error);
+        setLabel("Error");
       }
     };
 
@@ -51,6 +51,9 @@ const FearAndGreedGauge = () => {
   return (
     <motion.div
       className="p-4 rounded-2xl shadow-xl border border-gray-800 bg-[#1F1F2E]"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -66,34 +69,8 @@ const FearAndGreedGauge = () => {
             startAngle={-90}
             endAngle={90}
             value={indexValue}
+            valueMax={100}
           >
-            {/* Gauge Reference Arc (Segmented Colors) */}
-            <GaugeReferenceArc
-              startAngle={-90}
-              endAngle={-45}
-              strokeWidth={15}
-              color="#DC2626" // Red (Extreme Fear)
-            />
-            <GaugeReferenceArc
-              startAngle={-45}
-              endAngle={0}
-              strokeWidth={15}
-              color="#F59E0B" // Orange (Fear)
-            />
-            <GaugeReferenceArc
-              startAngle={0}
-              endAngle={45}
-              strokeWidth={15}
-              color="#EAB308" // Yellow (Greed)
-            />
-            <GaugeReferenceArc
-              startAngle={45}
-              endAngle={90}
-              strokeWidth={15}
-              color="#16A34A" // Green (Extreme Greed)
-            />
-
-            {/* Animated Gauge Value Arc */}
             <GaugeValueArc strokeWidth={10} color="white" />
             {/* White Marker (Pointer) */}
             <FearGreedPointer />

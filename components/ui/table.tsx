@@ -49,7 +49,7 @@ const TableRow = React.forwardRef<
   <motion.tr
     ref={ref}
     className={cn(
-      "border-b border-gray-800 transition-all duration-200 hover:bg-[#24243D] hover:shadow-md",
+      "border-b border-gray-800 transition-all duration-200 hover:bg-[#24243D] hover:shadow-md ",
       className
     )}
     whileHover={{ scale: 1.02 }}
@@ -65,7 +65,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "px-4 py-3 text-left text-gray-400 font-semibold tracking-wide text-sm",
+      "px-4 py-3 text-left text-gray-400  font-semibold tracking-wide text-sm",
       className
     )}
     {...props}

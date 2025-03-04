@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-//eslint-disable @typescript-eslint/no-explicit-any
-//eslint-disable @typescript-eslint/no-unused-vars
 
 import { cn } from "@/lib/utils";
 import React, {
@@ -96,7 +97,7 @@ export const CardBody = ({
   );
 };
 
-export const CardItem = ({
+export const CardItem = <T extends React.ElementType = 'div'>({
   as: Tag = "div",
   children,
   className,
@@ -108,7 +109,7 @@ export const CardItem = ({
   rotateZ = 0,
   ...rest
 }: {
-  as?: React.ElementType;
+  as?: T;
   children: React.ReactNode;
   className?: string;
   translateX?: number | string;
@@ -118,7 +119,7 @@ export const CardItem = ({
   rotateY?: number | string;
   rotateZ?: number | string;
   [key: string]: any;
-}) => {
+} & React.ComponentPropsWithoutRef<T>) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isMouseEntered] = useMouseEnter();
 
