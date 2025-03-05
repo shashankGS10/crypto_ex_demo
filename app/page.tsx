@@ -1,102 +1,159 @@
 "use client";
 
 import React from "react";
-import { HeroHighlight, Highlight } from "@/components/ui/hero-highlight";
-import {
-  CardContainer,
-  CardBody,
-  CardItem,
-} from "@/components/ui/3d-card";
 import { motion } from "framer-motion";
 import LockIcon from "@mui/icons-material/Lock";
 import SpeedIcon from "@mui/icons-material/Speed";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import Button from '@mui/material/Button';
-import Link from 'next/link';
+import Button from "@mui/material/Button";
+import Link from "next/link";
 
 export default function LandingPage() {
   const features = [
     {
-      icon: <LockIcon fontSize="large" />, 
+      icon: <LockIcon fontSize="large" />,
       title: "Secure Transactions",
       description:
-        "Industry-leading security ensures your assets and data are protected at all times.",
+        "Industry-leading security ensures your assets and data are protected.",
     },
     {
-      icon: <SpeedIcon fontSize="large" />, 
+      icon: <SpeedIcon fontSize="large" />,
       title: "Fast Performance",
       description:
-        "Experience lightning-fast trade execution and real-time updates for timely decisions.",
+        "Experience lightning-fast trade execution and real-time updates.",
     },
     {
-      icon: <CurrencyExchangeIcon fontSize="large" />, 
+      icon: <CurrencyExchangeIcon fontSize="large" />,
       title: "Low Fees",
       description:
-        "Enjoy competitive, transparent pricing with no hidden costs or surprise fees.",
+        "Competitive, transparent pricing with no hidden costs or surprise fees.",
     },
     {
-      icon: <SupportAgentIcon fontSize="large" />, 
+      icon: <SupportAgentIcon fontSize="large" />,
       title: "24/7 Support",
       description:
-        "Get round-the-clock assistance from our experts whenever you need help.",
+        "Round-the-clock assistance from our experts whenever you need help.",
     },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
+ 
   return (
-    <main className="relative overflow-hidden">
-      <HeroHighlight containerClassName="relative px-4 py-24 sm:py-32 sm:h-[45rem] z-10">
-        <div className="text-center max-w-3xl mx-auto">
+    <main className="relative overflow-hidden bg-[#0B0D17] text-white">
+      {/* Hero Section */}
+      <section className="relative px-4 py-24 sm:py-32 md:py-40 lg:py-48 flex items-center justify-center h-screen">
+
+        {/* Content */}
+        <div className="container mx-auto text-center relative z-10">
           <motion.h1
-            className="text-4xl font-extrabold text-black sm:text-5xl md:text-6xl relative"
-            initial={{ opacity: 0, y: -20 }}
+            className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#6EE2F5] to-[#6457E6] mb-4"
+            initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            Discover the Future of Finance with <Highlight>CryptoPlatform</Highlight>
+            The Future of Crypto Trading
           </motion.h1>
           <motion.p
-            className="mt-4 text-lg text-gray-300"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-lg text-gray-400 mb-8"
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
           >
-            Trade and manage your crypto assets with a secure, user-friendly platform designed for everyone.
+            Secure, fast, and user-friendly crypto platform designed for everyone.
           </motion.p>
           <motion.div
-            className="mt-8 flex flex-col sm:flex-row sm:justify-center gap-4"
+            className="flex justify-center"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.6 }}
           >
-          
-
-          <Link href="/dashboard" passHref>
-            <Button size="large" variant="contained">Go to Dashboard</Button>
-          </Link>
+            <Link href="/dashboard" passHref>
+              <Button
+                size="large"
+                variant="contained"
+                style={{ backgroundColor: "#6457E6", color: "white" }}
+              >
+                Go to Dashboard
+              </Button>
+            </Link>
           </motion.div>
         </div>
-      </HeroHighlight>
-      <section className="relative px-4 py-24 z-10">
-        <div className="max-w-5xl mx-auto text-center mb-16">
-          <h2 className="text-3xl font-bold text-black">Key Features</h2>
-          <p className="mt-2 text-gray-400">Trade with confidence using our cutting-edge features.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
-          {features.map((feat, idx) => (
-            <CardContainer key={idx} className="group relative p-6 min-h-50  rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-100 opacity-0 group-hover:opacity-20 transition-opacity" />
-              <CardBody>
-                <CardItem className="flex flex-col items-center p-4 text-center">
-                  <div className="mb-4 text-indigo-400 group-hover:scale-110 transition-transform">{feat.icon}</div>
-                  <h3 className="text-xl font-semibold text-black dark:text-black">{feat.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mt-2">{feat.description}</p>
-                </CardItem>
-              </CardBody>
-            </CardContainer>
-          ))}
-        </div>
       </section>
+
+      {/* Features Section */}
+      <section className="relative px-4 py-24 z-10 bg-[#0B0D17]">
+        <div className="max-w-6xl mx-auto text-center mb-16">
+          <motion.h2
+            className="text-3xl font-bold text-white mb-2"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            Key Features
+          </motion.h2>
+          <motion.p
+            className="text-gray-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          >
+            Trade with confidence using our cutting-edge features.
+          </motion.p>
+        </div>
+
+        {/* Features Grid */}
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {features.map((feat, idx) => (
+            <motion.div
+              key={idx}
+              className="relative p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-xl transition-shadow overflow-hidden"
+              variants={itemVariants}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900 opacity-0 hover:opacity-20 transition-opacity" />
+              <div className="flex flex-col items-center p-4 text-center">
+                <div className="mb-4 text-indigo-400 hover:scale-110 transition-transform">
+                  {feat.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-white">
+                  {feat.title}
+                </h3>
+                <p className="text-gray-500 mt-2">{feat.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 text-center text-gray-500 bg-[#0B0D17]">
+        <p>
+          &copy; {new Date().getFullYear()} CryptoPlatform. All rights reserved.
+        </p>
+      </footer>
     </main>
   );
 }

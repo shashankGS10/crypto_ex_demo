@@ -4,7 +4,6 @@ import CoinListCard from "@/components/CoinListCard";
 import FearGreedCard from "@/components/FearGreedCard";
 import DominanceChart from "@/components/DominanceChart";
 import CMC100Card from "@/components/CMC100Card";
-import Globe from "@/components/Globe";
 import Top10List from "@/components/Top10List";
 import Banner from "@/components/Banner";
 import TopConstituentsDonutChart from "@/components/TopConstituentsDonutChart";

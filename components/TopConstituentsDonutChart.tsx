@@ -50,7 +50,7 @@ const TopConstituentsDonutChart: React.FC = () => {
 
     formattedData = formattedData.slice(0, 9);
     formattedData.push({
-      id: "others",
+      id: 999, // Assign a unique number for "others"
       value: othersValue,
       label: "Others",
       name: "Others",
