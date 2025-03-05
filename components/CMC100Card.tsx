@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { SparkLineChart } from "@mui/x-charts/SparklineChart";
+import { SparkLineChart } from "@mui/x-charts";
 import { fetchCryptoData, CryptoData } from "@/utils/apiService";
 
 const LoadingPlaceholder = () => (
