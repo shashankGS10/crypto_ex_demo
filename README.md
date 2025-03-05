@@ -4,6 +4,8 @@
 
 This project aims to create a modern and engaging landing page for a cryptocurrency dashboard, inspired by clean, data-rich UI designs. The focus is on providing a user-friendly introduction to a platform for trading and managing crypto assets. The design is influenced by the dark, data-centric aesthetic commonly found in crypto tracking applications, as can be seen in the image.
 
+[Try Demo](https://crypto-ex-demo-puaxy8ghs-shashankgs10s-projects.vercel.app/)
+
 ## What I Tried To Make
 
 I tried to make a visually appealing and informative landing page that would attract users to a cryptocurrency dashboard. The key elements I wanted to include were:
