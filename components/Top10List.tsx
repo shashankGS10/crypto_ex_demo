@@ -1,20 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { useCryptoStore } from "@/store/useCryptoStore";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { fetchCryptoData } from "@/utils/apiService";
 
 const categories = ["🔥", "🆕", "👀"];
 
 const Top10List = () => {
-  const cryptos = useCryptoStore((state) => state.cryptos);
+  const [cryptos, setCryptos] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("🔥");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    // Fetch data using a default currency, e.g., "USD"
+    fetchCryptoData("USD")
+      .then((data) => {
+        setCryptos(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching crypto data:", err);
+        setLoading(false);
+      });
+  }, []);
 
   // Sort the cryptos based on the chosen category
   const getCategoryData = () => {
     switch (activeCategory) {
       case "🔥":
-        // Sort by 24h % change (descending)
+        // Trending: sort by 24h % change (descending)
         return [...cryptos]
           .sort(
             (a, b) =>
@@ -23,7 +38,7 @@ const Top10List = () => {
           )
           .slice(0, 10);
       case "🆕":
-        // Sort by newest date_added first
+        // New Added: sort by newest date_added first
         return [...cryptos]
           .sort(
             (a, b) =>
@@ -32,7 +47,7 @@ const Top10List = () => {
           )
           .slice(0, 10);
       case "👀":
-        // Sort by 'views' (descending)
+        // Most Visited: sort by 'views' (descending)
         return [...cryptos]
           .sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
           .slice(0, 10);
@@ -77,7 +92,9 @@ const Top10List = () => {
         </div>
       </div>
 
-      {data.length === 0 ? (
+      {loading ? (
+        <p className="text-gray-400 text-xs">Loading data...</p>
+      ) : data.length === 0 ? (
         <p className="text-gray-400 text-xs">No data available.</p>
       ) : (
         <div className="max-h-64 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-700">
@@ -94,12 +111,9 @@ const Top10List = () => {
               >
                 {/* Left side: rank & name */}
                 <div className="flex items-center space-x-2 text-xs">
-                  <span className="text-gray-400 font-semibold">
-                    {index + 1}.
-                  </span>
+                  <span className="text-gray-400 font-semibold">{index + 1}.</span>
                   <span className="text-gray-300 font-medium">
-                    {coin.name}{" "}
-                    <span className="text-gray-500">({coin.symbol})</span>
+                    {coin.name} <span className="text-gray-500">({coin.symbol})</span>
                   </span>
                 </div>
 
@@ -109,9 +123,7 @@ const Top10List = () => {
                     ${price.toLocaleString(undefined, { maximumFractionDigits: 6 })}
                   </p>
                   <p
-                    className={`text-xs font-semibold ${
-                      isPositive ? "text-green-500" : "text-red-500"
-                    }`}
+                    className={`text-xs font-semibold ${isPositive ? "text-green-500" : "text-red-500"}`}
                   >
                     {isPositive ? "+" : ""}
                     {change24h.toFixed(2)}%

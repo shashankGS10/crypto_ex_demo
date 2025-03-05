@@ -6,7 +6,8 @@ import DominanceChart from "@/components/DominanceChart";
 import CMC100Card from "@/components/CMC100Card";
 import Globe from "@/components/Globe";
 import Top10List from "@/components/Top10List";
-
+import Banner from "@/components/Banner";
+import TopConstituentsDonutChart from "@/components/TopConstituentsDonutChart";
 
 export default function Dashboard() {
   return (
@@ -30,11 +31,13 @@ export default function Dashboard() {
         {/* Right column */}
         <div className="space-y-4">
           <CMC100Card />
-          
           <DominanceChart />
+          <Banner />
         </div>
+        
         <div className="space-y-1">
-        <Globe />
+        {/* <Globe /> */}
+        <TopConstituentsDonutChart/>
         </div>
       </div>
       {/* FullTable of all coins (existing component) */}

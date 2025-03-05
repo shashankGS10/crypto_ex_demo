@@ -61,8 +61,7 @@ export default function CMC100Card() {
     <div className="p-4 rounded-2xl bg-[#1F1F2E] shadow-lg border border-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-gray-200 font-semibold">CMC100</h2>
-        <span className="text-gray-400 text-sm">›</span>
+        <h2 className="text-gray-200 font-semibold text-md">CMC100</h2>
       </div>
 
       {/* Price Display */}
@@ -72,8 +71,8 @@ export default function CMC100Card() {
         <ErrorPlaceholder />
       ) : btcData ? (
         <>
-          <p className="text-3xl text-white font-bold mt-1">${btcData.quote.USD.price.toFixed(2)}</p>
-          <p className={`text-lg font-medium ${btcData.quote.USD.percent_change_24h < 0 ? "text-red-500" : "text-green-500"}`}>
+          <p className="text-lg text-white font-bold mt-1">${btcData.quote.USD.price.toFixed(2)}</p>
+          <p className={`text-sm font-medium ${btcData.quote.USD.percent_change_24h < 0 ? "text-red-500" : "text-green-500"}`}>
             {btcData.quote.USD.percent_change_24h < 0 ? "▼" : "▲"}{" "}
             {Math.abs(btcData.quote.USD.percent_change_24h).toFixed(2)}%
           </p>

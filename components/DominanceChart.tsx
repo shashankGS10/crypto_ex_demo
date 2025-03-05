@@ -1,100 +1,123 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect, useMemo } from "react";
-import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
+
+import React, { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import {fetchDominanceData} from "@/utils/apiService";
+import { fetchDominanceData } from "@/utils/apiService";
 
-/**
- * Example fetch function that calls your existing Next.js API route or apiService
- * Adjust endpoint & response shape as needed
- */
-
+// If the server data doesn't include "change", you can define an interface or fallback
+interface ExtendedDominanceData {
+  name: string;
+  value: number;
+  color?: string;
+  change?: number; // Not in original DominanceData, but used for display
+}
 
 const DominanceChart = () => {
-  const [dominance, setDominance] = useState<
-    { name: string; value: number; color?: string }[]
-  >([]);
+  const [dominance, setDominance] = useState<ExtendedDominanceData[]>([
+    { name: "Bitcoin", value: 60.4, color: "#FF9900", change: 0.70 },
+    { name: "Ethereum", value: 9.1, color: "#627EEA", change: -1.63 },
+    { name: "Others", value: 30.5, color: "#8C8C8C", change: 0.93 },
+  ]);
 
-  // Example fallback slices if data is empty
-  const fallbackData = useMemo(() => [
-    { name: "BTC", value: 50, color: "#f2a900" },
-    { name: "ETH", value: 25, color: "#c6f200" },
-    { name: "Others", value: 25, color: "#0028f2" },
-  ], []);
-
-  // On mount, fetch real data
+  // Fetch data on mount
   useEffect(() => {
-    fetchDominanceData()
-      .then((data) => {
-        // If your API doesn't provide a color property, we can manually assign some futuristic ones:
-        const finalData = data.map((item: any) => {
-          if (item.name.toLowerCase().includes("btc")) {
-            return { ...item, color: "#f2a900" };
-          } else if (item.name.toLowerCase().includes("eth")) {
-            return { ...item, color: "#c6f200" };
-          }
-          // default purple or random color
-          return { ...item, color: item.color || "#0028f2" };
-        });
-        setDominance(finalData);
-      })
-      .catch((err) => {
-        console.error("Dominance fetch error:", err);
-        // fallback data if fetch fails
-        setDominance(fallbackData);
-      });
-  }, [fallbackData]);
+    const fetchData = async () => {
+      try {
+        // Server data might only have { name, value }, so we map to add color/change if needed
+        const data = await fetchDominanceData();
+        const updatedData = data.map((item) => {
+          // Provide defaults or map color based on name
+          let color = "#8C8C8C";
+          let change = 0; // fallback
 
-  // Fallback if dominance array is empty
-  const chartData = dominance.length > 0 ? dominance : fallbackData;
+          if (item.name.toLowerCase().includes("bitcoin")) {
+            color = "#FF9900";
+            change = 0.70; // Example fallback if not returned from API
+          } else if (item.name.toLowerCase().includes("eth")) {
+            color = "#627EEA";
+            change = -1.63; // Example fallback
+          } else {
+            color = "#8C8C8C";
+            change = 0.93; // Example fallback
+          }
+
+          return {
+            ...item,
+            color,
+            change: (item as ExtendedDominanceData).change ?? change,
+          };
+        });
+        setDominance(updatedData);
+      } catch (err) {
+        console.error("Dominance fetch error:", err);
+        // Use fallback data if fetch fails
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Sum for progress bar
+  const total = dominance.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
     <motion.div
-      className="p-4 rounded-2xl shadow-xl border border-gray-800 bg-gradient-to-br from-[#1A1A2E] to-[#13131F]"
+      className="p-4 rounded-2xl shadow-xl border border-gray-800 bg-[#1F1F2E] w-full max-w-md"
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      whileHover={{ scale: 1.02 }}
     >
-      <h2 className="text-gray-300 text-lg font-semibold mb-2">Dominance</h2>
+      {/* Title */}
+      <Typography variant="h6" className="text-lg text-white font-semibold mb-4">
+        Bitcoin Dominance
+      </Typography>
 
-      <div className="w-full h-40 relative">
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              outerRadius={60}
-              innerRadius={30}
-              paddingAngle={3}
-              stroke="none"
-              blendStroke
+      {/* Columns */}
+      <Box className="flex justify-between mb-4">
+        {dominance.map((item) => (
+          <Box key={item.name} className="text-center min-w-[80px]">
+            {/* Name */}
+            <Typography variant="body2" className="text-gray-400 flex items-center justify-center gap-1">
+              <span
+                className="inline-block w-2 h-2 rounded-full"
+                style={{ backgroundColor: item.color }}
+              />
+              {item.name}
+            </Typography>
+            {/* Value */}
+            <Typography variant="h5" className="font-bold text-md text-white">
+              {item.value.toFixed(1)}%
+            </Typography>
+            {/* Change */}
+            <Typography
+              variant="body2"
+              className={`${
+                item.change && item.change >= 0 ? "text-green-400" : "text-red-400"
+              } flex items-center justify-center`}
             >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={`url(#sliceGradient-${index})`} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{ backgroundColor: "#2A2A3D", border: "none" }}
-              labelStyle={{ color: "#ccc" }}
-              itemStyle={{ color: "#ccc" }}
-              cursor={{ fill: "rgba(255,255,255,0.1)" }}
+              {item.change && item.change >= 0 ? "▲" : "▼"} {Math.abs(item.change ?? 0).toFixed(2)}%
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+
+      {/* Progress Bar */}
+      <Box className="w-full h-2 bg-gray-700 rounded-full overflow-hidden flex">
+        {dominance.map((item, idx) => {
+          const segmentWidth = (item.value / total) * 100;
+          return (
+            <Box
+              key={item.name + idx}
+              className="h-full"
+              style={{
+                width: `${segmentWidth}%`,
+                backgroundColor: item.color,
+              }}
             />
-            {/* We define radial gradients for each slice to get a neon-like look */}
-            {chartData.map((entry, idx) => (
-              <defs key={`defs-${idx}`}>
-                <radialGradient id={`sliceGradient-${idx}`} cx="50%" cy="50%" r="75%">
-                  <stop offset="0%" stopColor={entry.color} stopOpacity={0.4} />
-                  <stop offset="70%" stopColor={entry.color} stopOpacity={0.8} />
-                  <stop offset="100%" stopColor={entry.color} stopOpacity={1} />
-                </radialGradient>
-              </defs>
-            ))}
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+          );
+        })}
+      </Box>
     </motion.div>
   );
 };

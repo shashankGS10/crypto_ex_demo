@@ -16,18 +16,13 @@ import {
   SpriteMaterial,
 } from "three";
 import ThreeGlobe from "three-globe";
-import { useThree, Object3DNode, Canvas, extend } from "@react-three/fiber";
+import { useThree, Object3D, Canvas, extend } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import countries from "@/data/globe.json"; // Assuming you have this file
 import {  fetchCryptoData } from "@/utils/apiService";
 
 extend({ ThreeGlobe });
 
-declare module "@react-three/fiber" {
-  interface ThreeElements {
-    threeGlobe: Object3DNode<ThreeGlobe, typeof ThreeGlobe>;
-  }
-}
 
 const RING_PROPAGATION_SPEED = 3;
 const aspect = 1.8;
@@ -55,7 +50,6 @@ export type GlobeConfig = {
   polygonColor?: string;
   ambientLight?: string;
   directionalLeftLight?: string;
-  directionalTopLight?: string;
   pointLight?: string;
   arcTime?: number;
   arcLength?: number;
@@ -323,7 +317,7 @@ export function World(props: WorldProps) {
   scene.fog = new Fog(0xffffff, 400, 2000);
 
   return (
-    <Canvas scene={scene} camera={new PerspectiveCamera(50, aspect, 120, 1800)}>
+    <Canvas style={{height:"60vh"}} scene={scene} camera={new PerspectiveCamera(50, aspect, 120, 1800)}>
       <WebGLRendererConfig />
       <ambientLight color={globeConfig.ambientLight} intensity={0.6} />
       <directionalLight
