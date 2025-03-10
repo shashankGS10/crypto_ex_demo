@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CryptoQuote {
   price: number;
   percent_change_1h: number;
@@ -26,6 +27,8 @@ export interface FearAndGreedData {
   timestamp: string;
   time_until_update: string;
 }
+
+
 
 // In-memory cache for API responses to avoid repetitive calls
 const cache: {

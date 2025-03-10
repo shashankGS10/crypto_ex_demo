@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useCryptoStore } from "@/store/useCryptoStore";
 import { fetchCryptoData } from "@/utils/apiService";
 import {
@@ -17,6 +18,7 @@ export default function FullTable() {
   const currency = useCryptoStore((state) => state.selectedCurrency);
   const setCurrency = useCryptoStore((state) => state.setSelectedCurrency);
   const setSelectedCrypto = useCryptoStore((state) => state.setSelectedCrypto);
+  const router = useRouter();
 
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -109,7 +111,10 @@ export default function FullTable() {
                 <TableRow
                   key={coin.id}
                   className="hover:bg-slate-600 cursor-pointer"
-                  onClick={() => setSelectedCrypto(coin)} // select coin for potential detail view
+                  onClick={() => {
+                    setSelectedCrypto(coin); // Save selected crypto
+                    router.push(`/dashboard/${coin.id}`); // Navigate
+                  }}
                 >
                   <TableCell className="font-medium">
                     {coin.name} <span className="text-gray-500">({coin.symbol})</span>
