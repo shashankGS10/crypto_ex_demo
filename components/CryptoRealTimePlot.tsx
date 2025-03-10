@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
@@ -29,24 +30,29 @@ export default function CryptoRealTimePlot() {
       .scaleLinear()
       .domain([d3.min(ohlcvData, (d) => d.low)! * 0.98, d3.max(ohlcvData, (d) => d.high)! * 1.02])
       .range([height - margin.bottom, margin.top]);
-    const tickFormat =
-      timeframe === "1D"
-        ? d3.timeFormat("%H:%M")
-        : timeframe === "7D"
-        ? d3.timeFormat("%b %d")
-        : timeframe === "1M"
-        ? d3.timeFormat("%b %d")
-        : timeframe === "1Y"
-        ? d3.timeFormat("%b %Y")
-        : d3.timeFormat("%Y");
+     
+      const tickFormat: (d: Date) => string = 
+      timeframe === "1D" ? d3.timeFormat("%H:%M") :
+      timeframe === "7D" ? d3.timeFormat("%b %d") :
+      timeframe === "1M" ? d3.timeFormat("%b %d") :
+      timeframe === "1Y" ? d3.timeFormat("%b %Y") :
+      d3.timeFormat("%Y");
+      
     const tickCount = timeframe === "1D" ? 6 : timeframe === "7D" ? 5 : timeframe === "1M" ? 5 : timeframe === "1Y" ? 4 : 4;
-    const zoomScale = {
+    const zoomScale: {
+      "1D": [number, number];
+      "7D": [number, number];
+      "1M": [number, number];
+      "1Y": [number, number];
+      All: [number, number];
+    } = {
       "1D": [1, 240],
       "7D": [1, 168],
       "1M": [1, 24],
       "1Y": [1, 3],
       All: [1, 6],
     };
+    
 
     function updateChart(transform: any) {
       const newXScale = transform.rescaleX(xScale);
@@ -67,7 +73,9 @@ export default function CryptoRealTimePlot() {
       }
       gYAxis.transition().duration(200).call(d3.axisRight(newYScale));
     
-      gXAxis.transition().duration(200).call(d3.axisBottom(newXScale).ticks(tickCount).tickFormat(tickFormat));
+      gXAxis.transition()
+  .duration(200)
+  .call(d3.axisBottom(newXScale).ticks(tickCount).tickFormat((d) => tickFormat(d as Date)));
       gYAxis.transition().duration(200).call(d3.axisRight(newYScale));
       gChart.selectAll("*").remove();
       if (activeTab === "price" || activeTab === "marketCap") {
@@ -135,15 +143,15 @@ export default function CryptoRealTimePlot() {
           .style("fill", (d) => {
             return `url(#${d.close >= d.open ? "bullishGradient" : "bearishGradient"})`;
           })
-          .each(function (d) {
-            // const isBullish = d.close >= d.open;
-            // const gradientId = isBullish ? "bullishGradient" : "bearishGradient";
-            const defs = d3.select(this.parentNode).select("defs");
+          .each(function () {
+            const parent = this.parentNode as Element;
+            // Select the parent node with the correct type
+            const defs = d3.select<Element, unknown>(parent).select<SVGDefsElement>("defs");
             if (defs.empty()) {
-              const defs = d3.select(this.parentNode).append("defs");
-              const bullishGradient = defs
+              const defsEnter = d3.select<Element, unknown>(parent).append<SVGDefsElement>("defs");
+              const bullishGradient = defsEnter
                 .append("linearGradient")
-                .attr("id", "bullishGradient")
+                .attr("id", "bullishGradient") 
                 .attr("x1", "0%")
                 .attr("y1", "0%")
                 .attr("x2", "0%")
@@ -194,13 +202,14 @@ export default function CryptoRealTimePlot() {
     updateChart(d3.zoomIdentity);
 
     const zoom = d3
-      .zoom()
-      .scaleExtent(zoomScale[timeframe])
-      .translateExtent([[0, 0], [width, height]])
-      .on("zoom", (event) => {
-        updateChart(event.transform);
-      });
-    svg.call(zoom);
+  .zoom<SVGSVGElement, unknown>()
+  .scaleExtent(zoomScale[timeframe])
+  .translateExtent([[0, 0], [width, height]])
+  .on("zoom", (event) => {
+    updateChart(event.transform);
+  });
+
+d3.select(svgRef.current).call(zoom);
 
     const hoverLine = d3
       .select(svgRef.current)
